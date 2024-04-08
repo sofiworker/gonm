@@ -7,8 +7,6 @@ package gonm
 import (
 	"github.com/sofiworker/gonm/logger"
 
-	// libnotify "github.com/sofiworker/gonm/libs/notify"
-	"github.com/sofiworker/gonm/libs/proxy"
 	"github.com/sofiworker/gonm/loader"
 	"github.com/sofiworker/gonm/proxychains"
 )
@@ -51,7 +49,7 @@ func (d *Module) GetDependencies() []string {
 }
 
 func (d *Module) start() error {
-	proxy.SetupProxy()
+	//proxy.SetupProxy()
 
 	service := loader.GetService()
 	manager = NewManager(service)
