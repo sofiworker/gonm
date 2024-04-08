@@ -275,7 +275,7 @@ func nmGeneralGetDeviceSpeedNumeric(devPath dbus.ObjectPath) (speed uint32) {
 
 // get device network speed (Mb/s)
 func nmGeneralGetDeviceSpeed(devPath dbus.ObjectPath) (speedStr string) {
-	speedStr = Tr("Unknown")
+	speedStr = "Unknown"
 
 	speed := nmGeneralGetDeviceSpeedNumeric(devPath)
 	if speed != 0 {
@@ -317,14 +317,11 @@ func nmGeneralGetDeviceSysPath(devPath dbus.ObjectPath) (sysPath string, err err
 }
 
 func nmGeneralGetDeviceDesc(devPath dbus.ObjectPath) (desc string) {
-	sysPath, err := nmGeneralGetDeviceSysPath(devPath)
-	if err != nil {
-		return
-	}
-	desc, ok := udevGetDeviceDesc(sysPath)
-	if !ok {
-		desc = nmGetDeviceInterface(devPath)
-	}
+	// sysPath, err := nmGeneralGetDeviceSysPath(devPath)
+	// if err != nil {
+	// 	return
+	// }
+	desc = nmGetDeviceInterface(devPath)
 	return
 }
 
@@ -349,7 +346,8 @@ func nmGeneralIsUsbDevice(devPath dbus.ObjectPath) bool {
 		}
 	}
 
-	return udevIsUsbDevice(sysPath)
+	return false
+	// return udevIsUsbDevice(sysPath)
 }
 
 // New network manager objects

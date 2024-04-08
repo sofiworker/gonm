@@ -1,9 +1,11 @@
 package gonm
 
 import (
+	"log"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func Test_getConnectionFiles(t *testing.T) {
@@ -45,4 +47,15 @@ func Test_getConnectionFiles(t *testing.T) {
 			assert.ElementsMatch(t, tt.want, got)
 		})
 	}
+}
+
+
+func TestGoNMStart(t *testing.T) {
+	g := GetGoNm()
+	err := g.Start()
+	if err != nil {
+		log.Fatal(err)
+		return 
+	}
+
 }

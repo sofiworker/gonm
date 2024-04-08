@@ -481,18 +481,18 @@ func (m *Manager) doGetActiveConnectionInfo(apath, devPath dbus.ObjectPath) (act
 		if getSettingVk8021xEnable(cdata) {
 			use8021xSecurity = true
 		} else {
-			security = Tr("None")
+			security = "None"
 		}
 	case nm.NM_SETTING_WIRELESS_SETTING_NAME:
 		switch getSettingVkWirelessSecurityKeyMgmt(cdata) {
 		case "none":
-			security = Tr("None")
+			security = "None"
 		case "wep":
-			security = Tr("WEP 40/128-bit Key")
+			security = "WEP 40/128-bit Key"
 		case "wpa-psk":
-			security = Tr("WPA/WPA2 Personal")
+			security = "WPA/WPA2 Personal"
 		case "sae":
-			security = Tr("WPA3 Personal")
+			security = "WPA3 Personal"
 		case "wpa-eap":
 			use8021xSecurity = true
 		}
@@ -500,17 +500,17 @@ func (m *Manager) doGetActiveConnectionInfo(apath, devPath dbus.ObjectPath) (act
 	if use8021xSecurity {
 		switch getSettingVk8021xEap(cdata) {
 		case "tls":
-			security = "EAP/" + Tr("TLS")
+			security = "EAP/" + "TLS"
 		case "md5":
-			security = "EAP/" + Tr("MD5")
+			security = "EAP/" + "MD5"
 		case "leap":
-			security = "EAP/" + Tr("LEAP")
+			security = "EAP/" + "LEAP"
 		case "fast":
-			security = "EAP/" + Tr("FAST")
+			security = "EAP/" + "FAST"
 		case "ttls":
-			security = "EAP/" + Tr("Tunneled TLS")
+			security = "EAP/" + "Tunneled TLS"
 		case "peap":
-			security = "EAP/" + Tr("Protected EAP")
+			security = "EAP/" + "Protected EAP"
 		}
 	}
 

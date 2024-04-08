@@ -21,4 +21,5 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 )

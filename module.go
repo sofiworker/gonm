@@ -6,9 +6,8 @@ package gonm
 
 import (
 	"github.com/sofiworker/gonm/logger"
-	"time"
 
-	libnotify "github.com/sofiworker/gonm/libs/notify"
+	// libnotify "github.com/sofiworker/gonm/libs/notify"
 	"github.com/sofiworker/gonm/libs/proxy"
 	"github.com/sofiworker/gonm/loader"
 	"github.com/sofiworker/gonm/proxychains"
@@ -18,24 +17,24 @@ var (
 	manager *Manager
 )
 
-func HandlePrepareForSleep(sleep bool) {
-	if manager == nil {
-		logger.Warning("Module 'network' has not start")
-		return
-	}
-	if sleep {
-		// suspend
-		disableNotify()
-		return
-	}
-	// wakeup
-	enableNotify()
-	//value decided the strategy of the wirelessScan
-	_ = manager.RequestWirelessScan()
-	time.AfterFunc(3*time.Second, func() {
-		manager.clearAccessPoints()
-	})
-}
+// func HandlePrepareForSleep(sleep bool) {
+// 	if manager == nil {
+// 		logger.Warning("Module 'network' has not start")
+// 		return
+// 	}
+// 	if sleep {
+// 		// suspend
+// 		disableNotify()
+// 		return
+// 	}
+// 	// wakeup
+// 	enableNotify()
+// 	//value decided the strategy of the wirelessScan
+// 	_ = manager.RequestWirelessScan()
+// 	time.AfterFunc(3*time.Second, func() {
+// 		manager.clearAccessPoints()
+// 	})
+// }
 
 type Module struct {
 	*loader.ModuleBase
@@ -103,14 +102,14 @@ func (d *Module) start() error {
 }
 
 func (d *Module) Start() error {
-	libnotify.Init("dde-session-daemon")
+	// libnotify.Init("dde-session-daemon")
 	if manager != nil {
 		return nil
 	}
 
 	initSlices() // initialize slice code
 	initSysSignalLoop()
-	initNotifyManager()
+	// initNotifyManager()
 	return d.start()
 }
 

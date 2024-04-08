@@ -343,11 +343,11 @@ func (m *Manager) getCreateConnectionName() string {
 	// get all connection index
 	for _, conn := range wiredConnSl {
 		// if current id dont contains Tr, ignore
-		if !strings.Contains(conn.Id, Tr("Wired Connection")) {
+		if !strings.Contains(conn.Id, "Wired Connection") {
 			continue
 		}
 		// trim left, " 1"
-		numStr := strings.TrimLeft(conn.Id, Tr("Wired Connection"))
+		numStr := strings.TrimLeft(conn.Id, "Wired Connection")
 		// id is Wired Connection, add 0 to sl
 		if numStr == "" {
 			numSl = append(numSl, 0)
@@ -386,7 +386,7 @@ func (m *Manager) getCreateConnectionName() string {
 		break
 	}
 
-	name := fmt.Sprintf(Tr("Wired Connection %v"), num)
+	name := fmt.Sprintf("Wired Connection %v", num)
 	logger.SDebugf("create name is %v", name)
 
 	return name

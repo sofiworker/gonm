@@ -5,6 +5,7 @@
 package proxychains
 
 import (
+	dbus "github.com/godbus/dbus/v5"
 	. "github.com/sofiworker/gonm/libs/gettext"
 	"github.com/sofiworker/gonm/logger"
 	notifications "github.com/sofiworker/gonm/system/session/org.freedesktop.notifications"

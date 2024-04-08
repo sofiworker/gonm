@@ -167,36 +167,36 @@ func _notify(icon, summary, body string) {
 }
 
 func notifyAirplanModeEnabled() {
-	notify(notifyIconNetworkOffline, Tr("Disconnected"), Tr("Airplane mode enabled."))
+	notify(notifyIconNetworkOffline, "Disconnected", "Airplane mode enabled.")
 }
 
 func notifyWiredCableUnplugged() {
-	notify(notifyIconWiredError, Tr("Disconnected"), deviceErrorTable[CUSTOM_NM_DEVICE_STATE_REASON_CABLE_UNPLUGGED])
+	notify(notifyIconWiredError, "Disconnected", deviceErrorTable[CUSTOM_NM_DEVICE_STATE_REASON_CABLE_UNPLUGGED])
 }
 
 func notifyApModeNotSupport() {
-	notify(notifyIconWirelessError, Tr("Disconnected"), Tr("Access Point mode is not supported by this device."))
+	notify(notifyIconWirelessError, "Disconnected", "Access Point mode is not supported by this device.")
 }
 
 func notifyWirelessHardSwitchOff() {
-	notify(notifyIconWirelessDisabled, Tr("Network"), Tr("The hardware switch of WLAN Card is off, please switch on as necessary."))
+	notify(notifyIconWirelessDisabled, "Network", "The hardware switch of WLAN Card is off, please switch on as necessary.")
 }
 
 func notifyProxyEnabled() {
-	notify(notifyIconProxyEnabled, Tr("Network"), Tr("System proxy is set successfully."))
+	notify(notifyIconProxyEnabled, "Network", "System proxy is set successfully.")
 }
 func notifyProxyDisabled() {
-	notify(notifyIconProxyDisabled, Tr("Network"), Tr("System proxy has been cancelled."))
+	notify(notifyIconProxyDisabled, "Network", "System proxy has been cancelled.")
 }
 
 func notifyVpnConnected(id string) {
-	notify(notifyIconVpnConnected, Tr("Connected"), id)
+	notify(notifyIconVpnConnected, "Connected", id)
 }
 func notifyVpnDisconnected(id string) {
-	notify(notifyIconVpnDisconnected, Tr("Disconnected"), id)
+	notify(notifyIconVpnDisconnected, "Disconnected", id)
 }
 func notifyVpnFailed(id string, reason uint32) {
-	notify(notifyIconVpnDisconnected, Tr("Disconnected"), vpnErrorTable[reason])
+	notify(notifyIconVpnDisconnected, "Disconnected", vpnErrorTable[reason])
 }
 
 func getMobileConnectedNotifyIcon(mobileNetworkType string) (icon string) {
@@ -285,5 +285,5 @@ func notifyDeviceRemoved(devPath dbus.ObjectPath) {
 	}
 	icon := generalGetNotifyDisconnectedIcon(devType, devPath)
 	msg := deviceErrorTable[nm.NM_DEVICE_STATE_REASON_REMOVED]
-	notify(icon, Tr("Disconnected"), msg)
+	notify(icon, "Disconnected", msg)
 }

@@ -1,20 +1,23 @@
 package gonm
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/godbus/dbus/v5"
-	"github.com/sofiworker/gonm/common/dsync"
-	"github.com/sofiworker/gonm/dbusutil"
-	"github.com/sofiworker/gonm/logger"
 	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"sync"
+
+	"github.com/godbus/dbus/v5"
+	"github.com/sofiworker/gonm/common/dsync"
+	"github.com/sofiworker/gonm/dbusutil"
+	"github.com/sofiworker/gonm/logger"
+	"gopkg.in/ini.v1"
 )
 
 const (
-	nmConnDir = "/etc/NetworkManager/system-connections"
+	NmConnDir = "/etc/NetworkManager/system-connections"
 
 	kfSectionConnection = "connection"
 	kfSectionWIFI       = "wifi"
@@ -46,23 +49,25 @@ type GoNm struct {
 	Options Options
 }
 
-func InitGoNm() {
+func GetGoNm() *GoNm {
 	gonmOnce.Do(func() {
 		instance = &GoNm{}
 	})
-}
-
-func GetGoNm() *GoNm {
 	return instance
 }
 
-func (g *GoNm) Start() {
+func (g *GoNm) Start() error {
 	module := NewModule()
-	module.Start()
+	err := module.Start()
+	if err != nil {
+		logger.SErrorf("start network module failed:%v", err)
+		return err
+	}
+	return nil
 }
 
 func NetworkGetConnections() (data []byte, busErr *dbus.Error) {
-	list, err := getConnectionList(nmConnDir)
+	list, err := getConnectionList(NmConnDir)
 	if err != nil {
 		return nil, dbusutil.ToError(err)
 	}
@@ -87,14 +92,14 @@ func NetworkSetConnections(data []byte) *dbus.Error {
 	if err != nil {
 		return dbusutil.ToError(err)
 	}
-	list, _ := getConnectionList(nmConnDir)
+	list, _ := getConnectionList(NmConnDir)
 	for _, conn := range info.Connections {
 		tmp := list.Get(conn.Type, conn.Filename)
 		if tmp != nil && tmp.Equal(conn) {
 			continue
 		}
 		// add or modify
-		err = conn.WriteFile(nmConnDir)
+		err = conn.WriteFile(NmConnDir)
 		if err != nil {
 			// TODO(jouyouyun): handle error
 			logger.SErrorf("[Network] Failed to write connection file:%v",
@@ -105,7 +110,7 @@ func NetworkSetConnections(data []byte) *dbus.Error {
 	}
 	removeList := info.Connections.Diff(list)
 	for _, conn := range removeList {
-		err = conn.RemoveFile(nmConnDir)
+		err = conn.RemoveFile(NmConnDir)
 		if err != nil {
 			// TODO(jouyouyun): handle error
 			logger.SErrorf("[Network] Failed to remove connection file:%v", err)
@@ -120,60 +125,50 @@ func NetworkSetConnections(data []byte) *dbus.Error {
 }
 
 func getConnectionList(dir string) (dsync.ConnectionList, error) {
-	//files, err := getConnectionFiles(dir)
-	//if err != nil {
-	//	return nil, err
-	//}
+	files, err := getConnectionFiles(dir)
+	if err != nil {
+		return nil, err
+	}
 
 	var datas dsync.ConnectionList
-	//for _, f := range files {
-	//data, err := loadConnectionFile(f)
-	//if err != nil {
-	//	continue
-	//}
-	//if datas.Exists(data) {
-	//	continue
-	//}
-	//datas = append(datas, data)
-	//}
+	for _, f := range files {
+		data, err := loadConnectionFile(f)
+		if err != nil {
+			continue
+		}
+		if datas.Exists(data) {
+			continue
+		}
+		datas = append(datas, data)
+	}
 	sort.Sort(datas)
 	return datas, nil
 }
 
-//func loadConnectionFile(filename string) (*dsync.Connection, error) {
-//	var kf = glib.NewKeyFile()
-//	// ignore comments and translations
-//	_, err := kf.LoadFromFile(filename, glib.KeyFileFlagsNone)
-//	if err != nil {
-//		return nil, err
-//	}
-//	defer kf.Free()
-//
-//	ty, err := kf.GetString(kfSectionConnection, kfKeyType)
-//	if err != nil {
-//		return nil, err
-//	}
-//	if ty != dsync.ConnTypeWIFI {
-//		return nil, dsync.ErrConnUnsupportedType
-//	}
-//
-//	// erase some keys
-//	_, _ = kf.RemoveKey(kfSectionConnection, kfKeyInterfaceName)
-//	_, _ = kf.RemoveKey(kfSectionWIFI, kfKeyMac)
-//	_, _ = kf.RemoveKey(kfSectionWIFI, kfKeyMacBlacklist)
-//	_, _ = kf.RemoveKey(kfSectionWIFI, kfKeySeenBSSID)
-//
-//	_, contents, err := kf.ToData()
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return &dsync.Connection{
-//		Type:     ty,
-//		Filename: filepath.Base(filename),
-//		Contents: []byte(contents),
-//	}, nil
-//}
+func loadConnectionFile(filename string) (*dsync.Connection, error) {
+	cfg, err := ini.Load(filename)
+	ty := cfg.Section(kfSectionConnection).Key(kfKeyType).String()
+	if ty != dsync.ConnTypeWIFI {
+		return nil, dsync.ErrConnUnsupportedType
+	}
+
+	cfg.Section(kfSectionConnection).DeleteKey(kfKeyInterfaceName)
+	cfg.Section(kfSectionWIFI).DeleteKey(kfKeyMac)
+	cfg.Section(kfSectionWIFI).DeleteKey(kfKeyMacBlacklist)
+	cfg.Section(kfSectionWIFI).DeleteKey(kfKeySeenBSSID)
+
+	var bs bytes.Buffer
+	_, err = cfg.WriteTo(&bs)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dsync.Connection{
+		Type:     ty,
+		Filename: filepath.Base(filename),
+		Contents: []byte(bs.Bytes()),
+	}, nil
+}
 
 func getConnectionFiles(dir string) ([]string, error) {
 	finfos, err := ioutil.ReadDir(dir)
